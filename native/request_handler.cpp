@@ -107,7 +107,7 @@ CefRefPtr<CefResourceRequestHandler> RequestHandler::GetResourceRequestHandler(
 }
 
 bool RequestHandler::GetAuthCredentials(CefRefPtr<CefBrowser> browser,
-                                        CefRefPtr<CefFrame> frame,
+                                        const CefString& origin_url,
                                         bool isProxy,
                                         const CefString& host,
                                         int port,
@@ -119,8 +119,7 @@ bool RequestHandler::GetAuthCredentials(CefRefPtr<CefBrowser> browser,
     return false;
 
   ScopedJNIBrowser jbrowser(env, browser);
-  ScopedJNIFrame jframe(env, frame);
-  jframe.SetTemporary();
+  ScopedJNIString jorigin_url(env, origin_url);
   ScopedJNIString jhost(env, host);
   ScopedJNIString jrealm(env, host);
   ScopedJNIString jscheme(env, host);
@@ -132,7 +131,7 @@ bool RequestHandler::GetAuthCredentials(CefRefPtr<CefBrowser> browser,
                   "CefFrame;ZLjava/lang/String;"
                   "ILjava/lang/String;Ljava/lang/String;"
                   "Lorg/cef/callback/CefAuthCallback;)Z",
-                  Boolean, jresult, jbrowser.get(), jframe.get(),
+                  Boolean, jresult, jbrowser.get(), jorigin_url.get(),
                   (isProxy ? JNI_TRUE : JNI_FALSE), jhost.get(), port,
                   jrealm.get(), jscheme.get(), jcallback.get());
 
